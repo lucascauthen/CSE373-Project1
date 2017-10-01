@@ -525,11 +525,61 @@ public class TestDoubleLinkedList extends BaseTest {
         }
     }
     @Test(timeout=SECOND)
-    public void testDelete() {
+    public void testDeleteSizeChange() {
     		IList<String> list = makeBasicList();
     		int size = list.size();
     		list.delete(0);
     		assertEquals(size - 1, list.size());
     		
     }
+    
+    @Test(timeout=SECOND)
+    public void testDeleteFront() {
+    		IList<String> list = this.makeBasicList();
+    		list.delete(0);
+    		assertEquals(list.get(0), "b");
+    		assertEquals(list.get(1), "c");
+    		assertEquals(list.size(), 2);
+    }
+    
+    @Test(timeout=SECOND)
+    public void testDeleteEnd() {
+    		IList<String> list = this.makeBasicList();
+    		list.delete(list.size() - 1);
+    		assertEquals(list.get(0), "a");
+    		assertEquals(list.get(1), "b");
+    		assertEquals(list.size(), 2);
+    }
+    
+    @Test(timeout=SECOND)
+    public void testDeleteEmpty() {
+    		IList<String> list = this.makeInstance();
+    		list.delete(0);
+    		
+    }
+    
+    @Test(timeout=SECOND)
+    public void testDeleteOutOfBounds() {
+    		IList<String> list = this.makeBasicList();
+    		try {
+    			list.delete(3);
+    			fail("Expected IndexOutOfBoundsException");
+    		} catch(IndexOutOfBoundsException ex) {
+    			//Good we threw the correct exception
+    		}
+    		
+    }
+    
+    @Test(timeout=SECOND)
+    public void testDeleteNegativeIndex() {
+    		IList<String> list = this.makeBasicList();
+    		try {
+    			list.delete(-1);
+    			fail("Expected IndexOutOfBoundsException");
+    		} catch(IndexOutOfBoundsException ex) {
+    			//Good we threw the correct exception
+    		}
+    		
+    }
+    
 }
