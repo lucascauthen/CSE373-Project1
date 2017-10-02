@@ -46,7 +46,12 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
 
     @Override
     public V get(K key) {
-        throw new NotYetImplementedException();
+        int index = this.indexOf(key);
+        if(index != -1) {
+            return pairs[index].value;
+        } else {
+            throw new NoSuchKeyException();
+        }
     }
 
     @Override
