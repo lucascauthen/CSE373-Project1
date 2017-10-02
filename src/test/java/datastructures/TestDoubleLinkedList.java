@@ -1,3 +1,6 @@
+//This method will run some tests to verify functions and efficiency 
+//of the DoubleLinkedList are normal.
+
 package datastructures;
 
 import static org.junit.Assert.assertTrue;
@@ -524,6 +527,8 @@ public class TestDoubleLinkedList extends BaseTest {
             count += 2;
         }
     }
+    
+    //a test to ensure that the size of list is correct after deleting
     @Test(timeout=SECOND)
     public void testDeleteSizeChange() {
     		IList<String> list = makeBasicList();
@@ -533,6 +538,8 @@ public class TestDoubleLinkedList extends BaseTest {
     		
     }
     
+    //tests which ensures the content of List is correct after deleting 
+    //data in front of list.
     @Test(timeout=SECOND)
     public void testDeleteFront() {
     		IList<String> list = this.makeBasicList();
@@ -542,6 +549,8 @@ public class TestDoubleLinkedList extends BaseTest {
     		assertEquals(list.size(), 2);
     }
     
+    //tests which ensures the content of List is correct after deleting 
+    //data at end of list.
     @Test(timeout=SECOND)
     public void testDeleteEnd() {
     		IList<String> list = this.makeBasicList();
@@ -551,6 +560,7 @@ public class TestDoubleLinkedList extends BaseTest {
     		assertEquals(list.size(), 2);
     }
     
+    //Tests to ensure that deleting from an empty list throws an exception.
     @Test(timeout=SECOND)
     public void testDeleteEmpty() {
     		IList<String> list = this.makeInstance();
@@ -562,6 +572,8 @@ public class TestDoubleLinkedList extends BaseTest {
     		}
     }
     
+    //A test to ensure that deleting an index that is out of range of the
+    //list throws an exception
     @Test(timeout=SECOND)
     public void testDeleteOutOfBounds() {
     		IList<String> list = this.makeBasicList();
@@ -574,6 +586,8 @@ public class TestDoubleLinkedList extends BaseTest {
     		
     }
     
+    //A test to ensure that deleting an negative index of the list 
+    //throws an exception
     @Test(timeout=SECOND)
     public void testDeleteNegativeIndex() {
     		IList<String> list = this.makeBasicList();
@@ -586,6 +600,7 @@ public class TestDoubleLinkedList extends BaseTest {
     		
     }
     
+    //A test to ensure that deleting at end of list is efficient
     @Test(timeout=15 * SECOND)
     public void testDeleteAtEndIsEfficient() {
         IList<Integer> list = this.makeInstance();
@@ -600,6 +615,7 @@ public class TestDoubleLinkedList extends BaseTest {
         assertEquals(0, list.size());
     }
     
+    //A test to ensure that deleting in front of list is efficient
     @Test(timeout=15 * SECOND)
     public void testDeleteAtFrontIsEfficient() {
         IList<Integer> list = this.makeInstance();
