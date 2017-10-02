@@ -136,11 +136,7 @@ public class DoubleLinkedList<T> implements IList<T> {
 		int index = 0;
 		Node<T> cur = front;
 		while (cur != null) {
-			if (cur.data != null) {
-				if (cur.data.equals(item)) {
-					return index;
-				}
-			} else if (cur.data == item) {
+			if ((cur.data != null && cur.data.equals(item)) || cur.data == item) {
 				return index;
 			}
 			cur = cur.next;

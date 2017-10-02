@@ -70,7 +70,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         			newArray[i] = pairs[i];
         		}
         		pairs = newArray;
-        		this.put(key, value); //
+        		this.put(key, value); //Rerun put again now that we have more space
         }
     }
 
@@ -104,9 +104,9 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
      * Returns -1 if there is no pair with the given key
      */
     private int indexOf(K key) {
-    		for(int i = 0; i < size; i++) {
-    			if(pairs[i].key.equals(key)) {
-    				return -1;
+    		for(int i = 0; i < size; i++) { 
+    			if((pairs[i].key != null && pairs[i].key.equals(key)) || pairs[i].key == key) { //Allow for null keys
+    				return i;
     			}
     		}
     		return -1;

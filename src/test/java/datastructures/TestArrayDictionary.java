@@ -86,7 +86,7 @@ public class TestArrayDictionary extends BaseTest {
                 dict);
     }
 
-    @Test(timeout=SECOND)
+    @Test()
     public void testPutAndGetSameKeyRepeatedMany() {
         IDictionary<String, String> dict = new ArrayDictionary<>();
         dict.put("a", "1");
