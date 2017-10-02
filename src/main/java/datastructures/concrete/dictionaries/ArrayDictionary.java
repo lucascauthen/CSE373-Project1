@@ -13,9 +13,13 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     private Pair<K, V>[] pairs;
 
     // You're encouraged to add extra fields (and helper methods) though!
+    private int size;
+    private int arraySize;
 
     public ArrayDictionary() {
-        throw new UnsupportedOperationException();
+        size = 0;
+        arraySize = 10;
+        pairs = (Pair<K, V>[]) new Pair[arraySize];
     }
 
     /**
