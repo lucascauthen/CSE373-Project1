@@ -19,7 +19,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     public ArrayDictionary() {
         size = 0;
         arraySize = 10;
-        pairs = (Pair<K, V>[]) new Pair[arraySize];
+        pairs = makeArrayOfPairs(arraySize);
     }
 
     /**
@@ -51,12 +51,23 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
 
     @Override
     public void put(K key, V value) {
-        throw new NotYetImplementedException();
+        if(size < arraySize) {
+        		pairs[size] = new Pair<>(key, value);
+        		size++;
+        } else { //Need to resize and copy everything over to the new array
+        		arraySize *= 2;
+        		Pair<K, V>[] newArray = makeArrayOfPairs(arraySize);
+        		for(int i = 0; i < this.size; i++) {
+        			newArray[i] = pairs[i];
+        		}
+        		pairs = newArray;
+        		this.put(key, value); //
+        }
     }
 
     @Override
     public V remove(K key) {
-        throw new NotYetImplementedException();
+        
     }
 
     @Override
@@ -67,6 +78,19 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     @Override
     public int size() {
         throw new NotYetImplementedException();
+    }
+    
+    /*
+     * Returns the index of a given key
+     * Returns -1 if there is no pair with the given key
+     */
+    private int indexOf(K key) {
+    		for(int i = 0; i < size; i++) {
+    			if(pairs[i].key.equals(key)) {
+    				return -1;
+    			}
+    		}
+    		return -1;
     }
 
     private static class Pair<K, V> {
