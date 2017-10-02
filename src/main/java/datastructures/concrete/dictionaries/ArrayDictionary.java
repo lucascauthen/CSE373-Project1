@@ -41,7 +41,6 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         // type erasure is, or how arrays and generics interact. Do not
         // modify this method in any way.
         return (Pair<K, V>[]) (new Pair[arraySize]);
-
     }
 
     @Override
@@ -57,8 +56,13 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     @Override
     public void put(K key, V value) {
         if(size < arraySize) {
-        		pairs[size] = new Pair<>(key, value);
-        		size++;
+        		int index = this.indexOf(key);
+        		if(index != -1) {
+        			pairs[index] = new Pair<>(key, value); //Change a key that already exists, does not modify size
+        		} else {
+        			pairs[size] = new Pair<>(key, value); //Add a new unique key to end
+        			size++;
+        		}
         } else { //Need to resize and copy everything over to the new array
         		arraySize *= 2;
         		Pair<K, V>[] newArray = makeArrayOfPairs(arraySize);
@@ -72,17 +76,27 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
 
     @Override
     public V remove(K key) {
-        
+    		int index = this.indexOf(key);
+    		if(index != -1) {
+    			V value = pairs[index].value;
+    			for(int i = index; i < size - 1; i++) {
+    				pairs[i] = pairs[i+1];
+    			}
+    			size--;
+    			return value;
+    		} else {
+    			throw new NoSuchKeyException();
+    		}
     }
 
     @Override
     public boolean containsKey(K key) {
-        throw new NotYetImplementedException();
+        return this.indexOf(key) != -1;
     }
 
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+        return size;
     }
     
     /*
