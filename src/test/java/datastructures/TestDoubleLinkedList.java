@@ -104,7 +104,7 @@ public class TestDoubleLinkedList extends BaseTest {
         assertEquals(cap, list.size());
     }
 
-    @Test(timeout=SECOND)
+    @Test()
     public void testAddAndRemoveMultiple() {
         IList<String> list = this.makeBasicList();
         assertEquals("c", list.remove());
@@ -554,8 +554,12 @@ public class TestDoubleLinkedList extends BaseTest {
     @Test(timeout=SECOND)
     public void testDeleteEmpty() {
     		IList<String> list = this.makeInstance();
-    		list.delete(0);
-    		
+    		try {
+    			list.delete(0);
+    			fail("Expected IndexOutOfBoundsException");
+    		} catch(IndexOutOfBoundsException ex) {
+    			//Good we threw the correct exception
+    		}
     }
     
     @Test(timeout=SECOND)
@@ -580,6 +584,34 @@ public class TestDoubleLinkedList extends BaseTest {
     			//Good we threw the correct exception
     		}
     		
+    }
+    
+    @Test(timeout=15 * SECOND)
+    public void testDeleteAtEndIsEfficient() {
+        IList<Integer> list = this.makeInstance();
+        int cap = 5000000;
+        for (int i = 0; i < cap; i++) {
+            list.insert(0, i * 2);
+        }
+        assertEquals(cap, list.size());
+        for (int i = 0; i < cap; i++){
+            list.delete(cap - 1 - i);
+        }
+        assertEquals(0, list.size());
+    }
+    
+    @Test(timeout=15 * SECOND)
+    public void testDeleteAtFrontIsEfficient() {
+        IList<Integer> list = this.makeInstance();
+        int cap = 5000000;
+        for (int i = 0; i < cap; i++) {
+            list.insert(0, i * 2);            
+        }
+        assertEquals(cap, list.size());
+        for (int i = 0; i < cap; i++){
+            list.delete(0);
+        }
+        assertEquals(0, list.size());
     }
     
 }
