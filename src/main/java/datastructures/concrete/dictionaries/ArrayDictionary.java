@@ -1,3 +1,5 @@
+//this class will keep track of an array thats contains Pair
+//objects.
 package datastructures.concrete.dictionaries;
 
 import datastructures.interfaces.IDictionary;
@@ -13,12 +15,12 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     private Pair<K, V>[] pairs;
 
     // You're encouraged to add extra fields (and helper methods) though!
-    private int size;
-    private int arraySize;
+    private int size;		// size of array
+    private int arraySize;	// maximum size of the array
 
     public ArrayDictionary() {
-        size = 0;
-        arraySize = 10;
+        size = 0;		//set the default size of array as 0 				
+        arraySize = 10;	//set the default maximum size of array as 10
         pairs = makeArrayOfPairs(arraySize);
     }
 
@@ -43,6 +45,9 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         return (Pair<K, V>[]) (new Pair[arraySize]);
     }
 
+    //passes an object K as a parameter. Searches the list and return 
+    //the value based on the index of the object K. Throws NoSuchKeyException
+    // otherwise.
     @Override
     public V get(K key) {
         int index = this.indexOf(key);
@@ -53,6 +58,10 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         }
     }
 
+    	//pass an object key and the other object V as parameters. Pair K and V
+    //and put them to the dictionary. If K has already existed in 
+    //dictionary, V will become the new value. Otherwise, a new pair
+    //will be created
     @Override
     public void put(K key, V value) {
         if(size < arraySize) {
@@ -74,6 +83,9 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         }
     }
 
+    //passes an object K as a parameter. Then it finds the matched
+    //pair in the dictionary based on the value of K. Throws
+    //NoSuchKeyException if K is not found in dictionary.
     @Override
     public V remove(K key) {
     		int index = this.indexOf(key);
@@ -88,12 +100,15 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     			throw new NoSuchKeyException();
     		}
     }
-
+    
+    //Pass an object K as a parameter. Return true if the 
+    //dictionary contains object K. False otherwise.
     @Override
     public boolean containsKey(K key) {
         return this.indexOf(key) != -1;
     }
 
+    //return the size of ArrayDictoinary
     @Override
     public int size() {
         return size;

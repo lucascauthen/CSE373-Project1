@@ -1,3 +1,7 @@
+//DoubleLinkedList is a list which contains sorted nodes.Each node has pointers
+//to both previous and next nodes. The list can also points to the first
+//or the last node in the sequence directly.
+
 package datastructures.concrete;
 
 import datastructures.interfaces.IList;
@@ -25,6 +29,7 @@ public class DoubleLinkedList<T> implements IList<T> {
 		this.size = 0;
 	}
 
+	//add a new node to the list
 	@Override
 	public void add(T item) {
 		if (front == null) { // Add when empty
@@ -40,6 +45,7 @@ public class DoubleLinkedList<T> implements IList<T> {
 		size++;
 	}
 
+	//remove a node from the list
 	@Override
 	public T remove() {
 		if (back != null) {
@@ -60,11 +66,16 @@ public class DoubleLinkedList<T> implements IList<T> {
 		throw new EmptyContainerException();
 	}
 
+	//pass an integer. return the value based 
+	//on the index of the given integer
 	@Override
 	public T get(int index) {
 		return this.getNode(index).data;
 	}
 
+	//pass an integer and an object T. Then find the node based
+	//on the index of the given integer and set the node's value to
+	//passed object T
 	@Override
 	public void set(int index, T item) {
 		Node<T> cur = this.getNode(index);
@@ -87,6 +98,8 @@ public class DoubleLinkedList<T> implements IList<T> {
 	}
 
 	@Override
+	//Pass an integer and an object T. Insert a new node with contains given
+	//T in front of the node which find based the index of given integer.
 	public void insert(int index, T item) {
 		if (index == size) { // Insert at end
 			this.add(item);
@@ -145,11 +158,14 @@ public class DoubleLinkedList<T> implements IList<T> {
 		return -1;
 	}
 
+	//Return the size of the list
 	@Override
 	public int size() {
 		return size;
 	}
 
+	//pass an object T. return true if the 
+	//index of T is not -1. False otherwise.
 	@Override
 	public boolean contains(T other) {
 		return this.indexOf(other) != -1;
@@ -164,6 +180,9 @@ public class DoubleLinkedList<T> implements IList<T> {
 		return new DoubleLinkedListIterator<>(this.front);
 	}
 
+	//pass an integer as a parameter. Return a Node<T> based on
+	//its index of the integer. Throw IndexOutOfBoundsException if
+	//the node with given index does not exist.
 	private Node<T> getNode(int index) {
 		if (index >= 0 && index < size) {
 			if (index < size / 2) { // If we are near the first half of elements start from the front
