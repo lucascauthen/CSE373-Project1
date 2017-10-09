@@ -2,6 +2,7 @@ package calculator.ast;
 
 import calculator.interpreter.Environment;
 import calculator.errors.EvaluationError;
+import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.IList;
 import misc.exceptions.NotYetImplementedException;
@@ -161,8 +162,8 @@ public class ExpressionManipulators {
 		} else if (getNumericValue(env, node, 4) <= 0) {
 			throw new EvaluationError("step is zero or negative");
 		}
-		IList<Double> xValues = null; // TODO: fix null pointer bug.
-		IList<Double> yValues = null;
+		IList<Double> xValues = new DoubleLinkedList<>();; 
+		IList<Double> yValues = new DoubleLinkedList<>();;
 		for (int i = 0; i <= (getNumericValue(env, node, 3) - getNumericValue(env, node, 2))
 				/ getNumericValue(env, node, 4); i++) {
 			double increments = i * getNumericValue(env, node, 4);
@@ -211,9 +212,7 @@ public class ExpressionManipulators {
 	}
 
 	private static boolean isDefined(Environment env, AstNode node, String varName) {
-		if (node.isVariable() && !node.getName().equals(varName)) {
-			return env.getVariables().containsKey(node.getName());
-		} else if (node.isOperation()) {
+		if (node.isOperation()) {
 			boolean result = true;
 			for (AstNode child : node.getChildren()) {
 				result = isDefined(env, child, varName);
@@ -221,7 +220,56 @@ public class ExpressionManipulators {
 					return result;
 				}
 			}
+			if (node.isVariable() && !node.getName().equals(varName)) {
+				return env.getVariables().containsKey(node.getName());
+			}
 		}
 		return true; // when node is a number
 	}
+	
+	//TODO: Solve function
+	/*
+	public static AstNode solve(Environment env, AstNode node) {
+		return new AstNode(toSolutionHelper(env, node));
+	}
+
+	private static double toSolutionHelper(Environment env, AstNode node) {
+		String varName = node.getChildren().get(1).getName();
+		for (AstNode child : node.getChildren()) {
+			if (isDefined(env, child, varName)) {
+				throw new EvaluationError("the expression contains an undefined variable");
+			}
+		}
+		//"=" should be the first node in expression
+		AstNode equalSign = node.getChildren().get(0).getChildren().get(0);
+		if(!equalSign.getName().equals("=")) {
+			throw new EvaluationError("the expression does not contain an equal sign");
+		}
+		checkNumberOfOperands(equalSign.getChildren(), 2);
+		AstNode rightSideNodes = equalSign.getChildren().get(1);
+		equalSign.getChildren().set(1, equal(equalSign.getChildren().get(0), equalSign.getChildren().get(1), varName, true, "+", 1)); 
+	}
+	
+	
+
+	private static AstNode equal(AstNode node1, AstNode node2, String varName, Boolean isLeftSide, String sign, int level ) {//pls find a better name
+		//need to solve sin/cos...etc special cases. 
+		AstNode baseNode = new AstNode(0);
+		if(isLeftSide) {
+			if(node2.isVariable() && node2.getName().equals(varName)) {
+				IList<AstNode> temp = new DoubleLinkedList<>(); //must import DoubleLinkedList
+				temp.add(baseNode);
+				temp.add(new	 AstNode(varName));
+				baseNode = new AstNode(sign, temp);
+			} else if(node2.isOperation()) {
+				String name = node2.getName();
+				IList<AstNode> children = node2.getChildren();
+				if(name.equals("+")) {
+					baseNode = equal(node2.getChildren().get(0), node2.getChildren().get(1), varName, )
+				}
+				
+			}
+		}
+	}	
+	*/
 }
