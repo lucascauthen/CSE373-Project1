@@ -112,6 +112,9 @@ public class ExpressionManipulators {
 			} else {
 				return new AstNode(toDoubleHelper(vars, node));
 			}
+		} else if(node.isVariable() && vars.containsKey(node.getName())) {
+			//Case when a variable is a root node
+			return new AstNode(toDoubleHelper(vars, node)); 
 		}
 		return node;
 	}
@@ -190,7 +193,6 @@ public class ExpressionManipulators {
 	private static boolean isExpression(IDictionary<String, AstNode> variables, AstNode node) {
 		if (node.isOperation()) {
 			String operationName = node.getName();
-			// TODO update this part for new added math functions
 			if (operationName.equals("/") || operationName.equals("sin") || operationName.equals("cos")) {
 				return true;
 			} else {
