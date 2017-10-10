@@ -154,7 +154,7 @@ public class ExpressionManipulators {
 	public static AstNode plot(Environment env, AstNode node) {
 		String varName = node.getChildren().get(1).getName();
 		for (AstNode child : node.getChildren()) {
-			if (isDefined(env, child, varName)) {
+			if (!isDefinedVariable(env, child, varName)) {
 				throw new EvaluationError("the expression contains an undefined variable");
 			}
 		}
@@ -172,7 +172,7 @@ public class ExpressionManipulators {
 			double increments = i * getNumericValue(env, node, 4);
 			xValues.add(getNumericValue(env, node, 2) + increments);
 			env.getVariables().put(varName, new AstNode(xValues.get(i)));
-			yValues.add(toDouble(env, node.getChildren().get(1)).getNumericValue());
+			yValues.add(toDouble(env, node.getChildren().get(0)).getNumericValue());
 		}
 		env.getVariables().remove(varName); // remove the value added during the loop
 		env.getImageDrawer().drawScatterPlot("plot", varName, "output", xValues, yValues);
@@ -213,18 +213,18 @@ public class ExpressionManipulators {
 		}
 	}
 
-	private static boolean isDefined(Environment env, AstNode node, String varName) {
+	private static boolean isDefinedVariable(Environment env, AstNode node, String varName) {
 		if (node.isOperation()) {
 			boolean result = true;
 			for (AstNode child : node.getChildren()) {
-				result = isDefined(env, child, varName);
+				result = isDefinedVariable(env, child, varName);
 				if (!result) {
 					return result;
 				}
 			}
-			if (node.isVariable() && !node.getName().equals(varName)) {
+			
+		}else if (node.isVariable() && !node.getName().equals(varName)) {
 				return env.getVariables().containsKey(node.getName());
-			}
 		}
 		return true; // when node is a number
 	}
