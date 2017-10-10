@@ -78,6 +78,9 @@ public class ExpressionManipulators {
 			} else if (name.equals("sqrt")) {
 				checkNumberOfOperands(children, 1);
 				return Math.sqrt(toDoubleHelper(variables, children.get(0)));
+			} else if (name.equals("toDouble")) {
+				checkNumberOfOperands(children, 1);
+				return toDoubleHelper(variables, simplifyHelper(variables, node.getChildren().get(0)));
 			} else {
 				throw new EvaluationError("Unknown operation: " + name);
 			}
@@ -93,28 +96,35 @@ public class ExpressionManipulators {
 	// TODO: Remove this comment when we are done testing
 	public static AstNode simplify(Environment env, AstNode node) {
 		IDictionary<String, AstNode> vars = env.getVariables();
-		if (node.isOperation() && node.getName().equals("simplify")) {
-			return simplifyHelper(env, node.getChildren().get(0));
+		if (node.isOperation()) {
+			String operation = node.getName();
+			if(operation.equals("simplify")) {
+				checkNumberOfOperands(node.getChildren(), 1);
+				return simplifyHelper(vars, node.getChildren().get(0));
+			} else {
+				return simplifyHelper(vars, node);
+			}
 		} else {
-			return simplifyHelper(env, node);
+			return simplifyHelper(vars, node);
 		}
 	}
 
-	public static AstNode simplifyHelper(Environment env, AstNode node) {
-		// TODO: Fix simplification of sin/cos/div/abs
-		IDictionary<String, AstNode> vars = env.getVariables();
+	public static AstNode simplifyHelper(IDictionary<String, AstNode> vars, AstNode node) {
 		if (node.isOperation()) {
 			if (isExpression(vars, node)) {
-				IList<AstNode> children = node.getChildren();
-				for (int i = 0; i < children.size(); i++) {
-					children.set(i, simplify(env, children.get(i)));
+				IList<AstNode> newChildren = new DoubleLinkedList<AstNode>();
+				IList<AstNode> oldChildren = node.getChildren();
+				for (int i = 0; i < oldChildren.size(); i++) {
+					newChildren.add(simplifyHelper(vars, oldChildren.get(i)));
 				}
+				return new AstNode(node.getName(), newChildren);
 			} else {
 				return new AstNode(toDoubleHelper(vars, node));
 			}
-		} else if(node.isVariable() && vars.containsKey(node.getName())) {
-			//Case when a variable is a root node
-			return new AstNode(toDoubleHelper(vars, node)); 
+		} else if(node.isVariable()) {
+			if(vars.containsKey(node.getName())) {
+				return simplifyHelper(vars, vars.get(node.getName()));
+			}
 		}
 		return node;
 	}
@@ -152,31 +162,38 @@ public class ExpressionManipulators {
 	 *             if 'step' is zero or negative
 	 */
 	public static AstNode plot(Environment env, AstNode node) {
+		
+		AstNode expression = simplify(env, node.getChildren().get(0));
+		double lowerBound = node.getChildren().get(2).getNumericValue();
+		double upperBound = node.getChildren().get(3).getNumericValue();
+		double step = node.getChildren().get(4).getNumericValue();
+		
 		String varName = node.getChildren().get(1).getName();
-		for (AstNode child : node.getChildren()) {
+		for (AstNode child : expression.getChildren()) {
 			if (!isDefinedVariable(env, child, varName)) {
 				throw new EvaluationError("the expression contains an undefined variable");
 			}
 		}
-		if (getNumericValue(env, node, 2) > getNumericValue(env, node, 3)) {
+		if (lowerBound > upperBound) {
 			throw new EvaluationError("varMin > varMax");
 		} else if (env.getVariables().containsKey(varName)) {
 			throw new EvaluationError("'var' was already defined");
-		} else if (getNumericValue(env, node, 4) <= 0) {
+		} else if (step <= 0) {
 			throw new EvaluationError("step is zero or negative");
 		}
+		
 		IList<Double> xValues = new DoubleLinkedList<>();; 
 		IList<Double> yValues = new DoubleLinkedList<>();;
 		for (int i = 0; i <= (getNumericValue(env, node, 3) - getNumericValue(env, node, 2))
-				/ getNumericValue(env, node, 4); i++) {
-			double increments = i * getNumericValue(env, node, 4);
-			xValues.add(getNumericValue(env, node, 2) + increments);
+				/ step; i++) {
+			double increments = i * step;
+			xValues.add(lowerBound + increments);
 			env.getVariables().put(varName, new AstNode(xValues.get(i)));
-			yValues.add(toDouble(env, node.getChildren().get(0)).getNumericValue());
+			yValues.add(toDoubleHelper(env.getVariables(), expression));
 		}
 		env.getVariables().remove(varName); // remove the value added during the loop
 		env.getImageDrawer().drawScatterPlot("plot", varName, "output", xValues, yValues);
-		return new AstNode(1);
+		return expression;
 	}
 
 	private static double getNumericValue(Environment env, AstNode node, int index) {
@@ -196,14 +213,15 @@ public class ExpressionManipulators {
 			if (operationName.equals("/") || operationName.equals("sin") || operationName.equals("cos")) {
 				return true;
 			} else {
-				boolean result = false;
 				for (AstNode child : node.getChildren()) {
-					result |= isExpression(variables, child);
+					if(isExpression(variables, child)) {
+						return true;
+					}
 				}
-				return result;
+				return false;
 			}
 		} else if (node.isVariable()) {
-			if (variables.containsKey(node.getName())) {
+			if (isConstant(variables, node)) {
 				return false;
 			} else {
 				return true;
@@ -212,6 +230,22 @@ public class ExpressionManipulators {
 			return false;
 		}
 	}
+	/*
+	 * Returns true if a variable evaluates to a constant
+	 * Returns false if the variable evaluates to an expression or is not a variable
+	 */
+	private static boolean isConstant(IDictionary<String, AstNode> vars, AstNode var) {
+		if(var.isVariable() && vars.containsKey(var.getName())) {
+			AstNode value = vars.get(var.getName());
+			if(value.isNumber()) {
+				return true;
+			} else {
+				return !isExpression(vars, value);
+			}
+		}
+		return false;
+	}
+	
 
 	private static boolean isDefinedVariable(Environment env, AstNode node, String varName) {
 		if (node.isOperation()) {
@@ -224,9 +258,11 @@ public class ExpressionManipulators {
 			}
 			
 		}else if (node.isVariable() && !node.getName().equals(varName)) {
+			if(!isConstant(env.getVariables(), node)) {
 				return env.getVariables().containsKey(node.getName());
+			}
 		}
-		return true; // when node is a number
+		return true;
 	}
 	
 	//TODO: Solve function
