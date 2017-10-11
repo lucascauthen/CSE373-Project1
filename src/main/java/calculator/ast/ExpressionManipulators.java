@@ -17,7 +17,8 @@ public class ExpressionManipulators {
 	// the computed double
 	// Throws EvaluationError if any of the expressions contains an
 	// undefined variable
-	// Throw EvaluationError if any of the expressions uses an unknown operation
+	// Throw EvaluationError if any of the expressions 
+	// uses an unknown operation
 	public static AstNode toDouble(Environment env, AstNode node) {
 		return new AstNode(toDoubleHelper(env.getVariables(), node));
 	}
@@ -26,13 +27,16 @@ public class ExpressionManipulators {
 	// return a double which attempts to evaluate the given AstNode.
 	// Throws EvaluationError if any of the expressions contains an
 	// undefined variable
-	// Throw EvaluationError if any of the expressions uses an unknown operation
-	private static double toDoubleHelper(IDictionary<String, AstNode> variables, AstNode node) {
+	// Throw EvaluationError if any of the expressions uses an 
+	// unknown operation
+	private static double toDoubleHelper(IDictionary<String, 
+									AstNode> variables, AstNode node) {
 		if (node.isNumber()) {
 			return node.getNumericValue();
 		} else if (node.isVariable()) {
 			if (!variables.containsKey(node.getName())) {
-				throw new EvaluationError("Undefined variable: " + node.getName());
+				throw new EvaluationError("Undefined variable: " + 
+												node.getName());
 			}
 			return variables.get(node.getName()).getNumericValue();
 		} else {
@@ -40,19 +44,24 @@ public class ExpressionManipulators {
 			IList<AstNode> children = node.getChildren();
 			if (name.equals("+")) {
 				checkNumberOfOperands(children, 2);
-				return toDoubleHelper(variables, children.get(0)) + toDoubleHelper(variables, children.get(1));
+				return toDoubleHelper(variables, children.get(0)) + 
+								toDoubleHelper(variables, children.get(1));
 			} else if (name.equals("-")) {
 				checkNumberOfOperands(children, 2);
-				return toDoubleHelper(variables, children.get(0)) - toDoubleHelper(variables, children.get(1));
+				return toDoubleHelper(variables, children.get(0)) - 
+								toDoubleHelper(variables, children.get(1));
 			} else if (name.equals("*")) {
 				checkNumberOfOperands(children, 2);
-				return toDoubleHelper(variables, children.get(0)) * toDoubleHelper(variables, children.get(1));
+				return toDoubleHelper(variables, children.get(0)) * 
+								toDoubleHelper(variables, children.get(1));
 			} else if (name.equals("/")) {
 				checkNumberOfOperands(children, 2);
-				return toDoubleHelper(variables, children.get(0)) / toDoubleHelper(variables, children.get(1));
+				return toDoubleHelper(variables, children.get(0)) / 
+								toDoubleHelper(variables, children.get(1));
 			} else if (name.equals("^")) {
 				checkNumberOfOperands(children, 2);
-				return Math.pow(toDoubleHelper(variables, children.get(0)), toDoubleHelper(variables, children.get(1)));
+				return Math.pow(toDoubleHelper(variables, children.get(0)), 
+								toDoubleHelper(variables, children.get(1)));
 			} else if (name.equals("negate")) {
 				checkNumberOfOperands(children, 1);
 				return -1 * toDoubleHelper(variables, children.get(0));
@@ -73,18 +82,19 @@ public class ExpressionManipulators {
 				return Math.sqrt(toDoubleHelper(variables, children.get(0)));
 			} else if (name.equals("toDouble")) {
 				checkNumberOfOperands(children, 1);
-				return toDoubleHelper(variables, simplifyHelper(variables, node.getChildren().get(0)));
+				return toDoubleHelper(variables, 
+						simplifyHelper(variables, node.getChildren().get(0)));
 			} else {
 				throw new EvaluationError("Unknown operation: " + name);
 			}
 		}
 	}
 
-	// Takes in the environment object as well as a root node of an expression tree
-	// Handles the simplify(...) operation, and returns a simplified version of the
-	// current node
-    // Throw EvaluationError if the simplify(...) operation contains the incorrect
-	// number of operands
+	// Takes in the environment object as well as a root node of an expression 
+	// tree. Handles the simplify(...) operation, and returns a simplified 
+	// version of the current node
+	// Throw EvaluationError if the simplify(...) operation contains the 
+	// incorrect number of operands
 	public static AstNode simplify(Environment env, AstNode node) {
 		IDictionary<String, AstNode> vars = env.getVariables();
 		if (node.isOperation()) {
@@ -101,9 +111,10 @@ public class ExpressionManipulators {
 	}
 
 	// Takes in the current valid variables and a node relative to simplify
-	// Returns a simplified version of the current node and that's node children
-	// Does not modify the current node or that node's children
-	public static AstNode simplifyHelper(IDictionary<String, AstNode> vars, AstNode node) {
+	// Returns a simplified version of the current node and that's node 
+	// children. Does not modify the current node or that node's children
+	public static AstNode simplifyHelper(IDictionary<String, AstNode> vars, 
+															AstNode node) {
 		if (node.isOperation()) {
 			if (isExpression(vars, node)) {
 				IList<AstNode> newChildren = new DoubleLinkedList<AstNode>();
@@ -128,8 +139,8 @@ public class ExpressionManipulators {
 	// expression which is used to plot the image, variable name,
 	// minimum value of the variable, maximum value of the variable and
 	// number of increment each time.
-	// It will analyze the node and plot the image using with the given data, and it
-	// returns a node which contains simplified version of the
+	// It will analyze the node and plot the image using with the given data,
+	// and it returns a node which contains simplified version of the
 	// expression(if possible)
 	// throws EvaluationError if any of the expressions contains an
 	// undefined variable.
@@ -140,14 +151,18 @@ public class ExpressionManipulators {
 	// zero or negative
 	public static AstNode plot(Environment env, AstNode node) {
 		AstNode expression = simplify(env, node.getChildren().get(0));
-		double lowerBound = toDoubleHelper(env.getVariables(), node.getChildren().get(2));
-		double upperBound = toDoubleHelper(env.getVariables(), node.getChildren().get(3));
-		double step = toDoubleHelper(env.getVariables(), node.getChildren().get(4));
+		double lowerBound = toDoubleHelper(env.getVariables(), 
+										node.getChildren().get(2));
+		double upperBound = toDoubleHelper(env.getVariables(), 
+										node.getChildren().get(3));
+		double step = toDoubleHelper(env.getVariables(), 
+										node.getChildren().get(4));
 
 		String varName = node.getChildren().get(1).getName();
 		for (AstNode child : expression.getChildren()) {
-			if (!isDefinedVariable(env, child, varName)) {
-				throw new EvaluationError("the expression contains an undefined variable");
+			if (!isDefinedVariable(env.getVariables(), child, varName)) {
+				throw new EvaluationError
+						("the expression contains an undefined variable");
 			}
 		}
 		if (lowerBound > upperBound) {
@@ -159,10 +174,9 @@ public class ExpressionManipulators {
 		}
 
 		IList<Double> xValues = new DoubleLinkedList<>();
-		;
 		IList<Double> yValues = new DoubleLinkedList<>();
-		;
-		for (int i = 0; i <= (getNumericValue(env, node, 3) - getNumericValue(env, node, 2)) / step; i++) {
+		for (int i = 0; i <= (getNumericValue(env, node, 3) - 
+							getNumericValue(env, node, 2)) / step; i++) {
 			double increments = i * step;
 			xValues.add(lowerBound + increments);
 			env.getVariables().put(varName, new AstNode(xValues.get(i)));
@@ -170,34 +184,40 @@ public class ExpressionManipulators {
 		}
 		// remove the temporary value added during the loop
 		env.getVariables().remove(varName);
-		env.getImageDrawer().drawScatterPlot("plot", varName, "output", xValues, yValues);
+		env.getImageDrawer().drawScatterPlot("plot", varName, 
+											"output", xValues, yValues);
 		return expression;
 	}
 
 	// Pass an Environment Object, an AstNode and an integer as parameters.
 	// Use integer to determine the index of the object we want to get.
 	// Return a double based on the index of the node's children
-	private static double getNumericValue(Environment env, AstNode node, int index) {
+	private static double getNumericValue(Environment env, 
+											AstNode node, int index) {
 		return toDouble(env, node.getChildren().get(index)).getNumericValue();
 	}
 
 	// Pass a IList<> object and an integer as parameters.
 	// If the size of IList<> is not equal to the given integer
 	// Throws an EvaluationError
-	private static void checkNumberOfOperands(IList<AstNode> children, int count) {
+	private static void checkNumberOfOperands(IList<AstNode> children, 
+												int count) {
 		if (children.size() != count) {
 			throw new EvaluationError(
-					"Given " + String.valueOf(children.size()) + " operands, but expected " + String.valueOf(count));
+					"Given " + String.valueOf(children.size()) + 
+						" operands, but expected " + String.valueOf(count));
 		}
 	}
 
 	// Pass an IDictionary<> object and an AstNode as parameters.
 	// Return true if the given node is an expression (contains at least on
 	// undefined variable). Otherwise false
-	private static boolean isExpression(IDictionary<String, AstNode> variables, AstNode node) {
+	private static boolean isExpression(IDictionary<String, AstNode> 
+												variables, AstNode node) {
 		if (node.isOperation()) {
 			String operationName = node.getName();
-			if (operationName.equals("/") || operationName.equals("sin") || operationName.equals("cos")) {
+			if (operationName.equals("/") || operationName.equals("sin") 
+											|| operationName.equals("cos")) {
 				return true;
 			} else {
 				for (AstNode child : node.getChildren()) {
@@ -219,8 +239,10 @@ public class ExpressionManipulators {
 	}
 
 	// Returns true if a variable evaluates to a constant
-	// Returns false if the variable evaluates to an expression or is not a variable
-	private static boolean isConstant(IDictionary<String, AstNode> vars, AstNode var) {
+	// Returns false if the variable evaluates to an 
+	// expression or is not a variable
+	private static boolean isConstant(IDictionary<String, AstNode> 
+										vars, AstNode var) {
 		if (var.isVariable() && vars.containsKey(var.getName())) {
 			AstNode value = vars.get(var.getName());
 			if (value.isNumber()) {
@@ -234,55 +256,22 @@ public class ExpressionManipulators {
 
 	// Pass an Environment object, an AstNode and a String as parameters.
 	// return false if the given node is not a defined variable and its
-	// name does not match the given String. Otherwise return ture.
-	private static boolean isDefinedVariable(Environment env, AstNode node, String varName) {
+	// name does not match the given String. Otherwise return true.
+	private static boolean isDefinedVariable(IDictionary<String, AstNode> 
+									variables, AstNode node, String varName) {
 		if (node.isOperation()) {
 			boolean result = true;
 			for (AstNode child : node.getChildren()) {
-				result = isDefinedVariable(env, child, varName);
+				result = isDefinedVariable(variables, child, varName);
 				if (!result) {
 					return result;
 				}
 			}
 		} else if (node.isVariable() && !node.getName().equals(varName)) {
-			if (!isConstant(env.getVariables(), node)) {
-				return env.getVariables().containsKey(node.getName());
+			if (!isConstant(variables, node)) {
+				return variables.containsKey(node.getName());
 			}
 		}
 		return true;
 	}
-
-	// TODO: Solve function
-	/*
-	 * public static AstNode solve(Environment env, AstNode node) { return new
-	 * AstNode(toSolutionHelper(env, node)); }
-	 * 
-	 * private static double toSolutionHelper(Environment env, AstNode node) {
-	 * String varName = node.getChildren().get(1).getName(); for (AstNode child :
-	 * node.getChildren()) { if (isDefined(env, child, varName)) { throw new
-	 * EvaluationError("the expression contains an undefined variable"); } } //"="
-	 * should be the first node in expression AstNode equalSign =
-	 * node.getChildren().get(0).getChildren().get(0);
-	 * if(!equalSign.getName().equals("=")) { throw new
-	 * EvaluationError("the expression does not contain an equal sign"); }
-	 * checkNumberOfOperands(equalSign.getChildren(), 2); AstNode rightSideNodes =
-	 * equalSign.getChildren().get(1); equalSign.getChildren().set(1,
-	 * equal(equalSign.getChildren().get(0), equalSign.getChildren().get(1),
-	 * varName, true, "+", 1)); }
-	 * 
-	 * 
-	 * 
-	 * private static AstNode equal(AstNode node1, AstNode node2, String varName,
-	 * Boolean isLeftSide, String sign, int level ) {//pls find a better name //need
-	 * to solve sin/cos...etc special cases. AstNode baseNode = new AstNode(0);
-	 * if(isLeftSide) { if(node2.isVariable() && node2.getName().equals(varName)) {
-	 * IList<AstNode> temp = new DoubleLinkedList<>(); //must import
-	 * DoubleLinkedList temp.add(baseNode); temp.add(new AstNode(varName)); baseNode
-	 * = new AstNode(sign, temp); } else if(node2.isOperation()) { String name =
-	 * node2.getName(); IList<AstNode> children = node2.getChildren();
-	 * if(name.equals("+")) { baseNode = equal(node2.getChildren().get(0),
-	 * node2.getChildren().get(1), varName, ) }
-	 * 
-	 * } } }
-	 */
 }
